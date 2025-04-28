@@ -1,7 +1,7 @@
-package api.store.gpt;
+package kr.co.parkcom.store.api.gpt;
 
-import api.store.gpt.dto.GptResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.parkcom.store.api.gpt.dto.GptResponse;
 import okhttp3.*;
 
 import java.io.IOException;

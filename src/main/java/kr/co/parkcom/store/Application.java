@@ -1,8 +1,9 @@
-package api.store.application;
+package kr.co.parkcom.store;
 
-import api.store.datalab.NaverDataLabClient;
-import api.store.gpt.GptContextService;
-import api.store.util.ConfigMapReader;
+
+import kr.co.parkcom.store.api.datalab.NaverDataLabClient;
+import kr.co.parkcom.store.api.gpt.GptContextService;
+import kr.co.parkcom.store.util.ConfigMapReader;
 
 public class Application {
 

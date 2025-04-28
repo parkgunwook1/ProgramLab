@@ -1,9 +1,9 @@
-package api.store.datalab;
+package kr.co.parkcom.store.api.datalab;
 
-import api.store.datalab.dto.Data;
-import api.store.datalab.dto.DataLabResponse;
-import api.store.datalab.dto.Result;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.parkcom.store.api.datalab.dto.Data;
+import kr.co.parkcom.store.api.datalab.dto.DataLabResponse;
+import kr.co.parkcom.store.api.datalab.dto.Result;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;

@@ -1,4 +1,4 @@
-package api.store.datalab.dto;
+package kr.co.parkcom.store.api.datalab.dto;
 
 public class Data {
     private String period; // ex) "2024-01-01"

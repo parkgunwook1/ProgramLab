@@ -1,4 +1,4 @@
-package api.store.gpt.dto;
+package kr.co.parkcom.store.api.gpt.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package api.store.util;
+package kr.co.parkcom.store.util;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
