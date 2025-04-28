@@ -1,4 +1,4 @@
-package api.store.gpt.vo;
+package api.store.gpt.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

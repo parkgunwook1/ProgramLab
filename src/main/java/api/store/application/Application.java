@@ -1,6 +1,6 @@
-package api.store.api;
+package api.store.application;
 
-import api.store.datalab.DataLabContextServer;
+import api.store.datalab.NaverDataLabClient;
 import api.store.gpt.GptContextService;
 import api.store.util.ConfigMapReader;
 
@@ -17,21 +17,19 @@ public class Application {
 
         String datalabKey = config.get("datalabApiKey");
         String datalabValue = config.get("datalabApiPwd");
+        String datalabUrl = config.get("datalabApiUrl");
 
-        System.out.println("gptApi key : " + gptApiKey);
-        System.out.println("datalab key : " + datalabKey + "datalab pwd : "+ datalabValue);
+        GptContextService gptServer = new GptContextService(gptApiKey, gptApiUrl, gptModel, gtpTemperature);
 
-        DataLabContextServer datalab = new DataLabContextServer(datalabKey , datalabValue);
-        GptContextService gptServer = new GptContextService(gptApiKey,gptApiUrl,gptModel,gtpTemperature);
-        
         String prompt = "배게와 관련된 좋은 키워드를 추천해줘";
         int count = 5;
         try {
-            String result = gptServer.extractKeywords(prompt , count);
-            System.out.println(result);
-        }catch (Exception e) {
+            NaverDataLabClient datalab = new NaverDataLabClient(datalabKey, datalabValue, datalabUrl);
+            datalab.requestDatalabApi();
+//            String result = gptServer.extractKeywords(prompt, count);
+//            System.out.println(result);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }

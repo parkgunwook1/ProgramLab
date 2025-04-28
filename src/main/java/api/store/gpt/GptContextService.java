@@ -1,8 +1,7 @@
 package api.store.gpt;
 
-import api.store.gpt.vo.GptResponse;
+import api.store.gpt.dto.GptResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -10,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * GPT API 호출과 키워드 추출 로직을 책임지는 서비스 클래스
