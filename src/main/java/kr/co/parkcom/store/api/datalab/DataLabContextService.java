@@ -18,8 +18,6 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
     private String apiId;
     private String apiPwd;
     private String apiUrl;
-    private URL url;
-    private HttpURLConnection conn;
     private ObjectMapper mapper;
 
 
@@ -28,14 +26,15 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
         this.apiPwd = apiPwd;
         this.apiUrl = apiUrl;
         this.mapper = new ObjectMapper();
-        this.url = new URL(apiUrl);
-        this.conn = (HttpURLConnection) url.openConnection();
-        basicSettings(conn);
     }
 
     public void requestDatalabApiTest() throws Exception {
         String keyword = "배게";
         String requestBody = buildRequestBody(keyword);
+
+        URL url = new URL(apiUrl);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        basicSettings(conn);
 
         OutputStream os = conn.getOutputStream();
         byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
@@ -142,6 +141,10 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
      */
     @Override
     public KeywordTrendResult analyzeKeywordTrend(String keyword) throws Exception {
+
+        URL url = new URL(apiUrl);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        basicSettings(conn);
 
         KeywordTrendResult keywordTrendResult;
         String requestBody = buildRequestBody(keyword);

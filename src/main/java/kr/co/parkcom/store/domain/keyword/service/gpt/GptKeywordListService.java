@@ -35,7 +35,7 @@ public class GptKeywordListService implements Runnable {
                     System.out.println("[GPT 공급] 키워드 리스트 채움. 현재 : " + getKeywordListSize() + "개");
                 }
 
-                Thread.sleep(300_000);
+                Thread.sleep(60_000);
             } catch (Exception e) {
                 System.out.println("gpt select thread error ");
                 e.printStackTrace();
