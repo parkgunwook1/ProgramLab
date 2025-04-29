@@ -2,6 +2,7 @@ package kr.co.parkcom.store.api.gpt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.parkcom.store.api.gpt.dto.GptResponse;
+import kr.co.parkcom.store.domain.keyword.service.gpt.IGptKeywordGenerator;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * GPT API 호출과 키워드 추출 로직을 책임지는 서비스 클래스
  */
-public class GptContextService {
+public class GptContextService implements IGptKeywordGenerator {
 
     private final OkHttpClient client;
     private final ObjectMapper mapper;
@@ -45,6 +46,7 @@ public class GptContextService {
     /**
      * 단어와 문맥를 함께 참고하여 핵심 키워드 추출
      */
+    @Override
     public String extractKeywords(String topic, int count, String context) throws IOException, Exception {
         String prompt = buildPrompt(topic, count, context);
         GptResponse resp = sendPrompt(prompt);
@@ -89,5 +91,29 @@ public class GptContextService {
             String respJson = response.body().string();
             return mapper.readValue(respJson, GptResponse.class);
         }
+    }
+
+    /**
+     * datalab에 사용할 list  추출
+     */
+
+    public GptResponse makeListDatalabKeyword() throws IOException , Exception {
+        String prompt = "다음 조건에 맞춰 데이터를 만들어줘.\n" +
+                "\n" +
+                "조건:\n" +
+                "- 마켓에 판매할 수 있는 **물건** 키워드만 (음식 제외)\n" +
+                "- 1월부터 12월까지 데이터 기반으로 많이 검색 되고 **잘 팔릴 것 같은 상품**을 중심으로\n" +
+                "- 분기에 2개씩 총 8개 키워드를 뽑아줘\n" +
+                "- 키워드는 **콤마(,)로 구분된 하나의 문자열**로 반환해줘\n" +
+                "- 예시: 신발, 슬리퍼, 선풍기, 물병, 이어폰, ...\n" +
+                "\n" +
+                "추가 지시:\n" +
+                "- 결과는 오직 키워드만 나열하고 설명은 하지 말 것\n" +
+                "- 콤마 뒤에는 반드시 **한 칸 띄워서** 키워드를 적을 것";
+
+        GptResponse response = sendPrompt(prompt);
+        // "- 분기에 25개씩 총 100개 키워드를 뽑아줘\n" +
+
+        return response;
     }
 }

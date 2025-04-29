@@ -1,9 +1,15 @@
 package kr.co.parkcom.store;
 
 
-import kr.co.parkcom.store.api.datalab.NaverDataLabClient;
+import kr.co.parkcom.store.api.datalab.DataLabContextService;
 import kr.co.parkcom.store.api.gpt.GptContextService;
+import kr.co.parkcom.store.db.DBManager;
+import kr.co.parkcom.store.db.IDBManager;
+import kr.co.parkcom.store.db.MockDBManager;
+import kr.co.parkcom.store.domain.keyword.service.datalab.DataLabKeywordService;
+import kr.co.parkcom.store.domain.keyword.service.gpt.GptKeywordListService;
 import kr.co.parkcom.store.util.ConfigMapReader;
+
 
 public class Application {
 
@@ -20,17 +26,33 @@ public class Application {
         String datalabValue = config.get("datalabApiPwd");
         String datalabUrl = config.get("datalabApiUrl");
 
-        GptContextService gptServer = new GptContextService(gptApiKey, gptApiUrl, gptModel, gtpTemperature);
 
-        String prompt = "배게와 관련된 좋은 키워드를 추천해줘";
-        int count = 5;
+        IDBManager idbManager;
+        String dbType = config.get("dbType");
+
+        if (dbType.equals("Y")) {
+            idbManager = new DBManager();
+        }else {
+            idbManager = new MockDBManager();
+        }
+        GptContextService gptService = null;
+        DataLabContextService datalabService = null;
+
+
         try {
-            NaverDataLabClient datalab = new NaverDataLabClient(datalabKey, datalabValue, datalabUrl);
-            datalab.requestDatalabApi();
-//            String result = gptServer.extractKeywords(prompt, count);
-//            System.out.println(result);
+            gptService = new GptContextService(gptApiKey, gptApiUrl, gptModel, gtpTemperature);
+            datalabService = new DataLabContextService(datalabKey, datalabValue, datalabUrl);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        GptKeywordListService keywordListService = new GptKeywordListService(gptService);
+        Thread gptThread = new Thread(keywordListService);
+        gptThread.start();
+
+        DataLabKeywordService dataLabKeywordService = new DataLabKeywordService(keywordListService , datalabService, idbManager);
+        Thread datalabThread = new Thread(dataLabKeywordService);
+        datalabThread.start();
+
     }
 }
