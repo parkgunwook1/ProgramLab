@@ -15,9 +15,10 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
-    implementation ("log4j:log4j:1.2.17")
-    implementation ("org.slf4j:slf4j-log4j12:1.7.29")
+    implementation ("org.slf4j:slf4j-api:2.0.9")
+    implementation ("ch.qos.logback:logback-classic:1.4.11")
     implementation ("org.projectlombok:lombok:1.18.22")
+    implementation("mysql:mysql-connector-java:8.0.33")
 
 }
 

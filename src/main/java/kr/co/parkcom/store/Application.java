@@ -9,9 +9,18 @@ import kr.co.parkcom.store.db.MockDBManager;
 import kr.co.parkcom.store.domain.keyword.service.datalab.DataLabKeywordService;
 import kr.co.parkcom.store.domain.keyword.service.gpt.GptKeywordListService;
 import kr.co.parkcom.store.util.ConfigMapReader;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 
 public class Application {
+
+    private static final Logger log = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) {
         ConfigMapReader config = new ConfigMapReader();
@@ -27,23 +36,37 @@ public class Application {
         String datalabUrl = config.get("datalabApiUrl");
 
 
-        IDBManager idbManager;
+        IDBManager idbManager = null;
         String dbType = config.get("dbType");
 
-        if (dbType.equals("Y")) {
-            idbManager = new DBManager();
-        }else {
-            idbManager = new MockDBManager();
+        String dbUrl = config.get("db.url");
+        String dbUser = config.get("db.user");
+        String dbPwd = config.get("db.password");
+
+        Connection dbCon = null;
+
+        try  {
+            dbCon = DriverManager.getConnection(dbUrl , dbUser , dbPwd);
+            if (dbCon != null) {
+                log.info("db connection success");
+                if (dbType.equals("Y")) {
+                    idbManager = new DBManager(dbCon);
+                }else {
+                    idbManager = new MockDBManager();
+                }
+            }
+        }catch (SQLException e) {
+            log.error("connection : {} " ,e.getMessage());
         }
+
         GptContextService gptService = null;
         DataLabContextService datalabService = null;
-
 
         try {
             gptService = new GptContextService(gptApiKey, gptApiUrl, gptModel, gtpTemperature);
             datalabService = new DataLabContextService(datalabKey, datalabValue, datalabUrl);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage() , e);
         }
 
         GptKeywordListService keywordListService = new GptKeywordListService(gptService);
