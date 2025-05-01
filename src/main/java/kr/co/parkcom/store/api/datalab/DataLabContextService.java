@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.parkcom.store.api.datalab.dto.Data;
 import kr.co.parkcom.store.api.datalab.dto.DataLabResponse;
 import kr.co.parkcom.store.api.datalab.dto.Result;
-import kr.co.parkcom.store.domain.keyword.dto.KeywordTrendResult;
+import kr.co.parkcom.store.domain.keyword.dto.KeywordMonth;
+import kr.co.parkcom.store.domain.keyword.dto.KeywordStatisticsTrendResult;
 import kr.co.parkcom.store.domain.keyword.service.datalab.IDatalabTrendAnalyzer;
 
 import java.io.OutputStream;
@@ -28,13 +29,18 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
         this.mapper = new ObjectMapper();
     }
 
-    public void requestDatalabApiTest() throws Exception {
-        String keyword = "배게";
-        String requestBody = buildRequestBody(keyword);
-
+    private HttpURLConnection initConnection() throws Exception{
         URL url = new URL(apiUrl);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         basicSettings(conn);
+
+        return conn;
+    }
+
+    public void requestDatalabApiTest() throws Exception {
+        String keyword = "배게";
+        String requestBody = buildRequestBody(keyword);
+        HttpURLConnection conn = initConnection();
 
         OutputStream os = conn.getOutputStream();
         byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
@@ -95,7 +101,7 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
     /**
      * 분기별(Q1~Q4) 검색량 평균을 구하는 메서드
      */
-    private KeywordTrendResult analyzeQuarterlyStatistics(DataLabResponse response , String keyword) {
+    private KeywordStatisticsTrendResult analyzeQuarterlyStatistics(DataLabResponse response , String keyword) {
         Result result = response.getResults().get(0);
         List<Data> dataList = result.getData();
 
@@ -106,6 +112,7 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
             String period = data.getPeriod(); // "2024-01-01"
             int month = Integer.parseInt(period.substring(5, 7)); // "01" → 1
 
+            // ratio : 	구간별 검색량의 상대적 비율. 구간별 결과에서 가장 큰 값을 100으로 설정한 상댓값
             if (month >= 1 && month <= 3) {
                 q1Sum += data.getRatio();
                 q1Count++;
@@ -126,7 +133,7 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
         int q3Avg = q3Count > 0 ? (int) (q3Sum / q3Count) : 0;
         int q4Avg = q4Count > 0 ? (int) (q4Sum / q4Count) : 0;
 
-        KeywordTrendResult keywordTrendResult = new KeywordTrendResult(keyword , q1Avg , q2Avg , q3Avg , q4Avg);
+        KeywordStatisticsTrendResult keywordTrendResult = new KeywordStatisticsTrendResult(keyword , q1Avg , q2Avg , q3Avg , q4Avg);
 
         System.out.println("1분기(1~3월) 평균 검색 비율: " + q1Avg);
         System.out.println("2분기(4~6월) 평균 검색 비율: " + q2Avg);
@@ -137,16 +144,15 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
     }
 
     /**
-     * keyword mapping return -> "KeywordTrendResult"
+     * keyword mapping return -> "KeywordStatisticsTrendResult"
+     * 분기 통계 메서드
      */
     @Override
-    public KeywordTrendResult analyzeKeywordTrend(String keyword) throws Exception {
+    public KeywordStatisticsTrendResult analyzeKeywordTrend(String keyword) throws Exception {
 
-        URL url = new URL(apiUrl);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        basicSettings(conn);
+        HttpURLConnection conn = initConnection();
 
-        KeywordTrendResult keywordTrendResult;
+        KeywordStatisticsTrendResult keywordTrendResult;
         String requestBody = buildRequestBody(keyword);
 
         OutputStream os = conn.getOutputStream();
@@ -170,5 +176,71 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
 
         }
             return keywordTrendResult;
+    }
+
+    /**
+     * keyword mapping return -> "KeywordStatisticsTrendResult"
+     * 월별 검색량 메서드
+     */
+    @Override
+    public KeywordMonth KeywordMonthTrend(String keyword) throws Exception {
+
+        HttpURLConnection conn = initConnection();
+
+        KeywordMonth keywordMonthResult;
+        String requestBody = buildRequestBody(keyword);
+
+        OutputStream os = conn.getOutputStream();
+        byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
+        os.write(input, 0, input.length);
+
+        int responseCode = conn.getResponseCode();
+
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            String response = new String(conn.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+
+            System.out.println("응답결과 : ");
+            System.out.println(response);
+
+            DataLabResponse dataLabResponse = mapper.readValue(response, DataLabResponse.class);
+            keywordMonthResult = analyzeKeywordMonthly(dataLabResponse, keyword);
+
+        } else {
+            String errorResponse = new String(conn.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
+            throw new RuntimeException("API 호출 실패: " + responseCode + "\n" + errorResponse);
+
+        }
+        return keywordMonthResult;
+    }
+
+    /**
+     * 검색량 1~12월 구하는 메서드
+     */
+    private KeywordMonth analyzeKeywordMonthly(DataLabResponse response , String keyword) {
+        Result result = response.getResults().get(0);
+        List<Data> dataList = result.getData();
+        KeywordMonth keywordMonth = new KeywordMonth(keyword);
+
+        for (Data data : dataList) {
+            String period = data.getPeriod(); // "2024-01-01"
+            int month = Integer.parseInt(period.substring(5, 7)); // "01" → 1
+
+            // ratio : 	구간별 검색량의 상대적 비율. 구간별 결과에서 가장 큰 값을 100으로 설정한 상댓값
+            switch (month) {
+                case 1 -> keywordMonth.setMonth1((int) data.getRatio());
+                case 2 -> keywordMonth.setMonth2((int) data.getRatio());
+                case 3 -> keywordMonth.setMonth3((int) data.getRatio());
+                case 4 -> keywordMonth.setMonth4((int) data.getRatio());
+                case 5 -> keywordMonth.setMonth5((int) data.getRatio());
+                case 6 -> keywordMonth.setMonth6((int) data.getRatio());
+                case 7 -> keywordMonth.setMonth7((int) data.getRatio());
+                case 8 -> keywordMonth.setMonth8((int) data.getRatio());
+                case 9 -> keywordMonth.setMonth9((int) data.getRatio());
+                case 10 -> keywordMonth.setMonth10((int) data.getRatio());
+                case 11 -> keywordMonth.setMonth11((int) data.getRatio());
+                case 12 -> keywordMonth.setMonth12((int) data.getRatio());
+            }
+        }
+        return keywordMonth;
     }
 }

@@ -1,6 +1,6 @@
 package kr.co.parkcom.store.domain.keyword.dto;
 
-public class KeywordTrendResult {
+public class KeywordStatisticsTrendResult {
 
     private String keyword;
     private int q1Avg;
@@ -8,7 +8,7 @@ public class KeywordTrendResult {
     private int q3Avg;
     private int q4Avg;
 
-    public KeywordTrendResult(String keyword, int q1Avg, int q2Avg, int q3Avg, int q4Avg) {
+    public KeywordStatisticsTrendResult(String keyword, int q1Avg, int q2Avg, int q3Avg, int q4Avg) {
         this.keyword = keyword;
         this.q1Avg = q1Avg;
         this.q2Avg = q2Avg;

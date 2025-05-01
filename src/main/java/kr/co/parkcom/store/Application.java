@@ -69,7 +69,7 @@ public class Application {
             log.error(e.getMessage() , e);
         }
 
-        GptKeywordListService keywordListService = new GptKeywordListService(gptService);
+        GptKeywordListService keywordListService = new GptKeywordListService(gptService , idbManager);
         Thread gptThread = new Thread(keywordListService);
         gptThread.start();
 

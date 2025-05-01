@@ -97,21 +97,23 @@ public class GptContextService implements IGptKeywordGenerator {
      * datalab에 사용할 list  추출
      */
 
-    public GptResponse makeListDatalabKeyword() throws IOException , Exception {
-        String prompt = "다음 조건에 맞춰 데이터를 만들어줘.\n" +
-                "\n" +
+    public GptResponse makeListDatalabKeyword(List<String> list) throws IOException , Exception {
+
+        String excludeList = String.join(", ", list);
+        System.out.println("make gpt - exclude Keyword list : " + excludeList);
+
+        String prompt = "다음 조건에 맞춰 키워드를 생성해줘.\n\n" +
                 "조건:\n" +
-                "- 마켓에 판매할 수 있는 **물건** 키워드만 (음식 제외)\n" +
-                "- 1월부터 12월까지 데이터 기반으로 많이 검색 되고 **잘 팔릴 것 같은 상품**을 중심으로\n" +
-                "- 분기에 25개씩 총 100개 키워드를 뽑아줘\n" +
-                "- 키워드는 **콤마(,)로 구분된 하나의 문자열**로 반환해줘\n" +
-                "- 그리고 너가 키워드 잘팔릴것만 한것을 융합해서 키워드를 나에게 줘도돼 \n" +
-                "- 내가 여태까지 너한테 요청한 것과 동일한 키워드가 있으면 안돼\n" +
-                "- 예시: 신발, 슬리퍼, 선풍기, 물병, 이어폰, ...\n" +
-                "\n" +
-                "추가 지시:\n" +
-                "- 결과는 오직 키워드만 나열하고 설명은 하지 말 것\n" +
-                "- 콤마 뒤에는 반드시 **한 칸 띄워서** 키워드를 적을 것";
+                "- 쿠팡, 스마트스토어, 지마켓, 11번가, 옥션 같은 **국내 온라인 마켓에서 실제로 판매 가능한 상품 키워드**만 생성할 것\n" +
+                "- **음식/식품은 제외**하고, 실체가 있는 물건(디지털, 생활, 리빙, 헬스케어 , 강아지 , 패션의류 , 스포츠 , 오피스 , 완구 , 취미 등)만 포함\n" +
+                "- **2024년 1월~12월까지의 검색 트렌드를 기반으로**, 실제로 많이 검색되고 판매 가능성이 높은 키워드 위주로\n" +
+                "- 키워드는 GPT 네가 봐도 '**내가 소비자라면 이건 사야 한다**'고 느껴질 만한 상품 위주로 선정할 것\n" +
+                "- 총 600개 키워드를 월별 50개씩 구성 (월별은 1월부터 12월까지)\n" +
+                "- 키워드는 **콤마(,)로 구분된 하나의 문자열**로만 반환하고, 설명은 절대 붙이지 말 것\n" +
+                "- 콤마 뒤에는 반드시 한 칸 띄어 쓸 것\n\n" +
+                "추가 조건:\n" +
+                "- 아래 키워드는 이미 수집된 키워드이므로 **절대 중복해서 포함하지 말 것**:\n" +
+                excludeList + "\n";
 
         GptResponse response = sendPrompt(prompt);
         // "- 분기에 25개씩 총 100개 키워드를 뽑아줘\n" +

@@ -15,11 +15,11 @@ public class Result {
         this.title = title;
     }
 
-    public List<String> getKeywords() {
+    public List<String> getKeyword() {
         return keywords;
     }
 
-    public void setKeywords(List<String> keywords) {
+    public void setKeywords(List<String> keyword) {
         this.keywords = keywords;
     }
 
