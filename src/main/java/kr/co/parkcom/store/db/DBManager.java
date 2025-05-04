@@ -46,12 +46,11 @@ public class DBManager implements IDBManager{
     }
 
     @Override
-    public int insertKeywordMonth(KeywordMonth keywordMonth) {
+    public void insertKeywordMonth(KeywordMonth keywordMonth) {
         String sql = "INSERT INTO keyword_monthly (keyword, jan_search, feb_search, mar_search, apr_search, may_search, jun_search, " +
                 "jul_search, aug_search, sep_search, oct_search, nov_search, dec_search)"
               +  "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-        int result = 0;
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1 , keywordMonth.getKeyword());
@@ -68,14 +67,10 @@ public class DBManager implements IDBManager{
             pstmt.setInt(12 , keywordMonth.getMonth11());
             pstmt.setInt(13 , keywordMonth.getMonth12());
 
-            result = pstmt.executeUpdate();
-
-            System.out.println(result);
+            pstmt.executeUpdate();
         }catch (Exception e) {
             log.error(e.getMessage() , e);
         }
-
-        return result;
     }
 
     @Override
@@ -85,6 +80,22 @@ public class DBManager implements IDBManager{
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                keywords.add(rs.getString("keyword"));
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return keywords;
+    }
+
+    public List<String> selectMonthKeyword() {
+        List<String> keywords = new ArrayList<>();
+        String sql = "SELECT keyword FROM keyword_monthly";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 keywords.add(rs.getString("keyword"));

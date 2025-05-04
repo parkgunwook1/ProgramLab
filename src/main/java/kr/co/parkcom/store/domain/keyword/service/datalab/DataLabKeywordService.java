@@ -9,6 +9,9 @@ import kr.co.parkcom.store.domain.keyword.service.gpt.GptKeywordListService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DataLabKeywordService implements Runnable{
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
@@ -25,24 +28,28 @@ public class DataLabKeywordService implements Runnable{
 
     @Override
     public void run() {
+        int dbResult = 0;
          while (true) {
              try {
                  if (gptKeywordListService.getKeywordListSize() > 0) {
                      String keyword = gptKeywordListService.getKeyword();
-//                     KeywordStatisticsTrendResult result = dataLabContextService.analyzeKeywordTrend(keyword);
-//                     int dbResult = idbManager.insertKeywordStatisticsTrend(result);
-                     KeywordMonth result = dataLabContextService.KeywordMonthTrend(keyword);
-                     int dbResult = idbManager.insertKeywordMonth(result);
+                     int count = 0;
+                     List<String> dbList;
+                     dbList = idbManager.selectMonthKeyword();
 
-                     if (dbResult == 0) {
-                         log.error("db insert failed");
+                     for (String list : dbList) {
+                         if (list.equals(keyword)) {
+                             count++;
+                         }
                      }
-
-                 }else {
-                     System.out.println("gptKeyword가 0보다 작습니다..");
+                     if (count != 0) {
+                         KeywordMonth result = dataLabContextService.KeywordMonthTrend(keyword);
+                         idbManager.insertKeywordMonth(result);
+                         dbResult++;
+                     }
                  }
-
-                 Thread.sleep(60_000);
+                 System.out.println(dbResult);
+                 Thread.sleep(2_000);
              } catch (Exception e) {
                  e.printStackTrace();
              }

@@ -9,7 +9,8 @@ import java.util.List;
 public interface IDBManager {
 
     int insertKeywordStatisticsTrend(KeywordStatisticsTrendResult keywordTrendResult);
-    int insertKeywordMonth(KeywordMonth keywordMonth);
+    void insertKeywordMonth(KeywordMonth keywordMonth);
     List<String> selectKeywordTrend();
+    List<String> selectMonthKeyword();
 
 }

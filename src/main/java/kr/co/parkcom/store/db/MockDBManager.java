@@ -16,12 +16,17 @@ public class MockDBManager implements IDBManager{
     }
 
     @Override
-    public int insertKeywordMonth(KeywordMonth keywordMonth) {
-        return 0;
+    public void insertKeywordMonth(KeywordMonth keywordMonth) {
+
     }
 
     @Override
     public List<String> selectKeywordTrend() {
+        return null;
+    }
+
+    @Override
+    public List<String> selectMonthKeyword() {
         return null;
     }
 }
