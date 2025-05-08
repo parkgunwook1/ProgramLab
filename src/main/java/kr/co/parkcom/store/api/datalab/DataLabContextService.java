@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.parkcom.store.api.datalab.dto.Data;
 import kr.co.parkcom.store.api.datalab.dto.DataLabResponse;
 import kr.co.parkcom.store.api.datalab.dto.Result;
-import kr.co.parkcom.store.domain.keyword.dto.KeywordMonth;
-import kr.co.parkcom.store.domain.keyword.dto.KeywordStatisticsTrendResult;
-import kr.co.parkcom.store.domain.keyword.service.datalab.IDatalabTrendAnalyzer;
+import kr.co.parkcom.store.domain.keyword.service.datalab.dto.KeywordSearchMonth;
+import kr.co.parkcom.store.domain.keyword.service.datalab.dto.KeywordStatisticsTrendResult;
+import kr.co.parkcom.store.domain.keyword.service.datalab.search.IDatalabSearchTrendAnalyzer;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -14,7 +14,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public class DataLabContextService implements IDatalabTrendAnalyzer {
+public class DataLabContextService implements IDatalabSearchTrendAnalyzer {
 
     private String apiId;
     private String apiPwd;
@@ -37,32 +37,6 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
         return conn;
     }
 
-    public void requestDatalabApiTest() throws Exception {
-        String keyword = "배게";
-        String requestBody = buildRequestBody(keyword);
-        HttpURLConnection conn = initConnection();
-
-        OutputStream os = conn.getOutputStream();
-        byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
-        os.write(input, 0, input.length);
-
-        int responseCode = conn.getResponseCode();
-
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            String response = new String(conn.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-
-            System.out.println("응답결과 : ");
-            System.out.println(response);
-
-            DataLabResponse dataLabResponse = mapper.readValue(response , DataLabResponse.class);
-            analyzeQuarterlyStatistics(dataLabResponse , keyword);
-
-        } else {
-            String errorResponse = new String(conn.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
-            throw new RuntimeException("API 호출 실패: " + responseCode + "\n" + errorResponse);
-        }
-    }
-
     private void basicSettings(HttpURLConnection conn) throws Exception {
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/json");
@@ -71,7 +45,34 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
         conn.setDoOutput(true);
     }
 
-    /**
+
+    /** category 테스트
+     *
+     */
+    private static String ClickRequestBody() {
+        return """
+                            {
+                               "startDate": "2024-01-01",
+                               "endDate": "2024-12-31",
+                               "timeUnit": "month",
+                               "category": [
+                                 {
+                                   "name": "패션의류",
+                                   "param": [ "50000000" ]
+                                 },
+                                 {
+                                   "name": "화장품/미용",
+                                   "param": [ "50000002" ]
+                                 }
+                               ],
+                               "device": "pc",
+                               "gender": "f",
+                               "ages": [ "20", "30" ]
+                             }
+                }""";
+    };
+
+    /** 검색량 조회 메서드
      * startDate : 조회 시작일
      * endDate   : 조회 종료일
      * timeUnit  : 시간 단위
@@ -80,7 +81,7 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
      * ages      : 조회할 연령대 코드 (3: 19~24세, 4: 25~29세, 5: 30~34세, 6: 35~39세, 7: 40~44세, 8: 45~49세, 9: 50~54세, 10: 55~59세)
      * gender    : 조회할 성별 ("m" | "f" | 생략 가능)
      */
-    private static String buildRequestBody(String keyword) {
+    private static String SearchRequestBody(String keyword) {
         return """
                 {
                   "startDate": "2024-01-01",
@@ -143,17 +144,16 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
         return keywordTrendResult;
     }
 
-    /**
+    /** 분기 검색량 통계 메서드
      * keyword mapping return -> "KeywordStatisticsTrendResult"
-     * 분기 통계 메서드
      */
     @Override
-    public KeywordStatisticsTrendResult analyzeKeywordTrend(String keyword) throws Exception {
+    public KeywordStatisticsTrendResult analyzeSearchKeywordTrend(String keyword) throws Exception {
 
         HttpURLConnection conn = initConnection();
 
         KeywordStatisticsTrendResult keywordTrendResult;
-        String requestBody = buildRequestBody(keyword);
+        String requestBody = SearchRequestBody(keyword);
 
         OutputStream os = conn.getOutputStream();
         byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
@@ -178,17 +178,16 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
             return keywordTrendResult;
     }
 
-    /**
+    /** 월별 검색량 메서드
      * keyword mapping return -> "KeywordStatisticsTrendResult"
-     * 월별 검색량 메서드
      */
     @Override
-    public KeywordMonth KeywordMonthTrend(String keyword) throws Exception {
+    public KeywordSearchMonth KeywordSearchMonthTrend(String keyword) throws Exception {
 
         HttpURLConnection conn = initConnection();
 
-        KeywordMonth keywordMonthResult;
-        String requestBody = buildRequestBody(keyword);
+        KeywordSearchMonth keywordMonthResult;
+        String requestBody = SearchRequestBody(keyword);
 
         OutputStream os = conn.getOutputStream();
         byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
@@ -213,13 +212,12 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
         return keywordMonthResult;
     }
 
-    /**
-     * 검색량 1~12월 구하는 메서드
+    /** 검색량 1~12월 구하는 메서드
      */
-    private KeywordMonth analyzeKeywordMonthly(DataLabResponse response , String keyword) {
+    private KeywordSearchMonth analyzeKeywordMonthly(DataLabResponse response , String keyword) {
         Result result = response.getResults().get(0);
         List<Data> dataList = result.getData();
-        KeywordMonth keywordMonth = new KeywordMonth(keyword);
+        KeywordSearchMonth keywordMonth = new KeywordSearchMonth(keyword);
 
         for (Data data : dataList) {
             String period = data.getPeriod(); // "2024-01-01"
@@ -243,4 +241,31 @@ public class DataLabContextService implements IDatalabTrendAnalyzer {
         }
         return keywordMonth;
     }
-}
+
+    public void KeywordClickTrend() throws Exception{
+        HttpURLConnection conn = initConnection();
+
+        String requestBody = ClickRequestBody();
+
+
+        OutputStream os = conn.getOutputStream();
+        byte[] input = requestBody.getBytes(StandardCharsets.UTF_8);
+        os.write(input, 0, input.length);
+
+        int responseCode = conn.getResponseCode();
+
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            String response = new String(conn.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+
+            System.out.println("응답결과 : ");
+            System.out.println(response);
+
+//            DataLabResponse dataLabResponse = mapper.readValue(response, DataLabResponse.class);
+
+        } else {
+            String errorResponse = new String(conn.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
+            throw new RuntimeException("API 호출 실패: " + responseCode + "\n" + errorResponse);
+
+        }
+    }
+    }

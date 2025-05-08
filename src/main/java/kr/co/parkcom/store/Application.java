@@ -6,10 +6,9 @@ import kr.co.parkcom.store.api.gpt.GptContextService;
 import kr.co.parkcom.store.db.DBManager;
 import kr.co.parkcom.store.db.IDBManager;
 import kr.co.parkcom.store.db.MockDBManager;
-import kr.co.parkcom.store.domain.keyword.service.datalab.DataLabKeywordService;
+import kr.co.parkcom.store.domain.keyword.service.datalab.search.DataLabKeywordSearchService;
 import kr.co.parkcom.store.domain.keyword.service.gpt.GptKeywordListService;
 import kr.co.parkcom.store.util.ConfigMapReader;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +72,7 @@ public class Application {
         Thread gptThread = new Thread(keywordListService);
         gptThread.start();
 
-        DataLabKeywordService dataLabKeywordService = new DataLabKeywordService(keywordListService , datalabService, idbManager);
+        DataLabKeywordSearchService dataLabKeywordService = new DataLabKeywordSearchService(keywordListService , datalabService, idbManager);
         Thread datalabThread = new Thread(dataLabKeywordService);
         datalabThread.start();
 

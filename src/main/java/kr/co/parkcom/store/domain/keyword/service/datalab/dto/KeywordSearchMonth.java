@@ -1,7 +1,7 @@
-package kr.co.parkcom.store.domain.keyword.dto;
+package kr.co.parkcom.store.domain.keyword.service.datalab.dto;
 
 
-public class KeywordMonth {
+public class KeywordSearchMonth {
 
     private String keyword;
     private int month1;
@@ -17,7 +17,7 @@ public class KeywordMonth {
     private int month11;
     private int month12;
 
-    public KeywordMonth(String keyword) {
+    public KeywordSearchMonth(String keyword) {
         this.keyword = keyword;
     }
 

@@ -1,10 +1,9 @@
 package kr.co.parkcom.store.db;
 
 import kr.co.parkcom.store.Application;
-import kr.co.parkcom.store.domain.keyword.dto.KeywordMonth;
-import kr.co.parkcom.store.domain.keyword.dto.KeywordStatisticsTrendResult;
+import kr.co.parkcom.store.domain.keyword.service.datalab.dto.KeywordSearchMonth;
+import kr.co.parkcom.store.domain.keyword.service.datalab.dto.KeywordStatisticsTrendResult;
 import kr.co.parkcom.store.util.ConfigMapReader;
-import okhttp3.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +45,8 @@ public class DBManager implements IDBManager{
     }
 
     @Override
-    public void insertKeywordMonth(KeywordMonth keywordMonth) {
-        String sql = "INSERT INTO keyword_monthly (keyword, jan_search, feb_search, mar_search, apr_search, may_search, jun_search, " +
+    public void insertKeywordMonth(KeywordSearchMonth keywordMonth) {
+        String sql = "INSERT INTO keyword_search_monthly(keyword, jan_search, feb_search, mar_search, apr_search, may_search, jun_search, " +
                 "jul_search, aug_search, sep_search, oct_search, nov_search, dec_search)"
               +  "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
 

@@ -1,7 +1,7 @@
 package kr.co.parkcom.store.db;
 
-import kr.co.parkcom.store.domain.keyword.dto.KeywordMonth;
-import kr.co.parkcom.store.domain.keyword.dto.KeywordStatisticsTrendResult;
+import kr.co.parkcom.store.domain.keyword.service.datalab.dto.KeywordSearchMonth;
+import kr.co.parkcom.store.domain.keyword.service.datalab.dto.KeywordStatisticsTrendResult;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ public class MockDBManager implements IDBManager{
     }
 
     @Override
-    public void insertKeywordMonth(KeywordMonth keywordMonth) {
+    public void insertKeywordMonth(KeywordSearchMonth keywordMonth) {
 
     }
 

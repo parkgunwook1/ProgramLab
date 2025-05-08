@@ -1,6 +1,6 @@
 package kr.co.parkcom.store.api.datalab;
 
-import kr.co.parkcom.store.domain.keyword.dto.KeywordMonth;
+import kr.co.parkcom.store.domain.keyword.service.datalab.dto.KeywordSearchMonth;
 import kr.co.parkcom.store.util.ConfigMapReader;
 
 public class DataLabContextServiceTest {
@@ -11,12 +11,15 @@ public class DataLabContextServiceTest {
 
         String datalabKey = config.get("datalabApiKey");
         String datalabValue = config.get("datalabApiPwd");
-        String datalabUrl = config.get("datalabApiUrl");
+//        String datalabUrl = config.get("datalabApiUrl");
 
+        String datalabClickUrl = config.get("datalabApiClickUrl");
         try {
-            DataLabContextService service = new DataLabContextService(datalabKey , datalabValue , datalabUrl);
-            KeywordMonth keywordMonth =  service.KeywordMonthTrend("우산");
-            System.out.println(keywordMonth.toString());
+            DataLabContextService service = new DataLabContextService(datalabKey , datalabValue , datalabClickUrl);
+//            KeywordSearchMonth keywordMonth =  service.KeywordSearchMonthTrend("우산");
+
+            service.KeywordClickTrend();
+//                System.out.println(keywordMonth.toString());
         }catch (Exception e) {
             e.printStackTrace();
         }
