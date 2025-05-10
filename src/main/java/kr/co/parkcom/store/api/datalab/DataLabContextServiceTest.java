@@ -18,7 +18,7 @@ public class DataLabContextServiceTest {
             DataLabContextService service = new DataLabContextService(datalabKey , datalabValue , datalabClickUrl);
 //            KeywordSearchMonth keywordMonth =  service.KeywordSearchMonthTrend("우산");
 
-            service.KeywordClickTrend();
+//            service.KeywordClickTrend();
 //                System.out.println(keywordMonth.toString());
         }catch (Exception e) {
             e.printStackTrace();

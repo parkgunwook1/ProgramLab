@@ -6,6 +6,7 @@ import kr.co.parkcom.store.api.gpt.GptContextService;
 import kr.co.parkcom.store.db.DBManager;
 import kr.co.parkcom.store.db.IDBManager;
 import kr.co.parkcom.store.db.MockDBManager;
+import kr.co.parkcom.store.domain.keyword.service.datalab.click.DataLabKeywordClickService;
 import kr.co.parkcom.store.domain.keyword.service.datalab.search.DataLabKeywordSearchService;
 import kr.co.parkcom.store.domain.keyword.service.gpt.GptKeywordListService;
 import kr.co.parkcom.store.util.ConfigMapReader;
@@ -32,8 +33,9 @@ public class Application {
 
         String datalabKey = config.get("datalabApiKey");
         String datalabValue = config.get("datalabApiPwd");
-        String datalabUrl = config.get("datalabApiUrl");
+        String datalabSearchUrl = config.get("datalabSearchApiUrl");
 
+        String dataClickUrl = config.get("datalabApiClickUrl");
 
         IDBManager idbManager = null;
         String dbType = config.get("dbType");
@@ -59,22 +61,29 @@ public class Application {
         }
 
         GptContextService gptService = null;
-        DataLabContextService datalabService = null;
+        DataLabContextService searchService = null;
+        DataLabContextService clickhService = null;
 
         try {
             gptService = new GptContextService(gptApiKey, gptApiUrl, gptModel, gtpTemperature);
-            datalabService = new DataLabContextService(datalabKey, datalabValue, datalabUrl);
+            searchService = new DataLabContextService(datalabKey, datalabValue , datalabSearchUrl);
+            clickhService = new DataLabContextService(datalabKey , datalabValue , dataClickUrl);
+
         } catch (Exception e) {
             log.error(e.getMessage() , e);
         }
 
-        GptKeywordListService keywordListService = new GptKeywordListService(gptService , idbManager);
-        Thread gptThread = new Thread(keywordListService);
+        GptKeywordListService gptList = new GptKeywordListService(gptService , idbManager);
+        Thread gptThread = new Thread(gptList);
         gptThread.start();
 
-        DataLabKeywordSearchService dataLabKeywordService = new DataLabKeywordSearchService(keywordListService , datalabService, idbManager);
-        Thread datalabThread = new Thread(dataLabKeywordService);
+        DataLabKeywordSearchService keywordService = new DataLabKeywordSearchService(gptList , searchService, idbManager);
+        Thread datalabThread = new Thread(keywordService);
         datalabThread.start();
+
+        DataLabKeywordClickService clickService = new DataLabKeywordClickService(gptList , clickhService , idbManager);
+        Thread clickThread = new Thread(clickService);
+        clickThread.start();
 
     }
 }

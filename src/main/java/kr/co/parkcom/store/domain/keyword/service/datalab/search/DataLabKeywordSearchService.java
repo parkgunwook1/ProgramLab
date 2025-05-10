@@ -17,6 +17,7 @@ public class DataLabKeywordSearchService implements Runnable{
     private GptKeywordListService gptKeywordListService;
     private DataLabContextService dataLabContextService;
     private IDBManager idbManager;
+
     public DataLabKeywordSearchService(GptKeywordListService gptKeywordListService , DataLabContextService dataLabContextService , IDBManager idbManager) {
         this.gptKeywordListService = gptKeywordListService;
         this.dataLabContextService = dataLabContextService;
@@ -29,7 +30,7 @@ public class DataLabKeywordSearchService implements Runnable{
         int dbResult = 0;
          while (true) {
              try {
-                 if (gptKeywordListService.getKeywordListSize() > 0) {
+                 if (gptKeywordListService.getSearchListSize() > 0) {
                      String keyword = gptKeywordListService.getKeyword();
                      int count = 0;
                      List<String> dbList;

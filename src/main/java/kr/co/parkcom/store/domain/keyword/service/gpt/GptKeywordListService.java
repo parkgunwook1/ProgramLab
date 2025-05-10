@@ -9,37 +9,53 @@ import java.util.List;
 
 public class GptKeywordListService implements Runnable {
 
-    private List<String> keywordList;
+    private List<String> searchList;
+    private List<String> categoryList;
     private GptContextService gptContextService;
     private IDBManager idbManager;
 
     public GptKeywordListService(GptContextService gptContextService, IDBManager idbManager) {
         this.gptContextService = gptContextService;
         this.idbManager = idbManager;
-        this.keywordList = new ArrayList<>();
+        this.searchList = new ArrayList<>();
+        this.categoryList = new ArrayList<>();
     }
+
     @Override
     public void run() {
         while (true) {
             try {
-                if (getKeywordListSize() < 5) {
-                    System.out.println("[GPT 공급] 키워드 부족. GPT 호출 ");
+                if (getSearchListSize() < 5) {
+                    System.out.println("[GPT 공급] 검색량 키워드 부족. GPT 호출 ");
 
-                    // gpt  로직 빼도될듯?
-                    //
                     List<String> list = idbManager.selectKeywordTrend();
-                    GptResponse response = gptContextService.makeListDatalabKeyword(list);
+                    GptResponse response = gptContextService.makeSearchList(list);
                     String content = response.getChoices().get(0).getMessage().getContent().trim();
 
                     String[] keywords = content.split(",");
 
                     for (String keyword : keywords) {
                         System.out.println("keyword : " + keyword);
-                        synchronized (keywordList) {
-                            keywordList.add(keyword.trim());
+                        synchronized (searchList) {
+                            searchList.add(keyword.trim());
                         }
                     }
-                    System.out.println("[GPT 공급] 키워드 리스트 채움. 현재 : " + getKeywordListSize() + "개");
+                    System.out.println("[GPT 공급] 검색량 키워드 리스트 채움. 현재 : " + getSearchListSize() + "개");
+                } else if (getClickListSize() < 5) {
+                    System.out.println("[GPT 공급] 카테고리 키워드 부족. GPT 호출");
+
+                    GptResponse response = gptContextService.makeClickList();
+                    String content = response.getChoices().get(0).getMessage().getContent().trim();
+
+                    String[] keywords = content.split(",");
+
+                    for (String keyword : keywords) {
+                        System.out.println("keyword : " + keyword);
+                        synchronized (searchList) {
+                            searchList.add(keyword.trim());
+                        }
+                    }
+                    System.out.println("[GPT 공급] 카테고리 키워드 리스트 채움. 현재 : " + getSearchListSize() + "개");
                 }
 
                 Thread.sleep(2_000);
@@ -50,18 +66,26 @@ public class GptKeywordListService implements Runnable {
         }
     }
 
-    public int getKeywordListSize() {
+    public int getClickListSize() {
         int size;
-        synchronized (keywordList) {
-            size = keywordList.size();
+        synchronized (categoryList) {
+            size = categoryList.size();
+        }
+        return size;
+    }
+
+    public int getSearchListSize() {
+        int size;
+        synchronized (searchList) {
+            size = searchList.size();
         }
         return size;
     }
 
     public String getKeyword() {
-        synchronized (keywordList) {
-            if (!keywordList.isEmpty()) {
-                return keywordList.remove(0);
+        synchronized (searchList) {
+            if (!searchList.isEmpty()) {
+                return searchList.remove(0);
             }
         }
         return null;

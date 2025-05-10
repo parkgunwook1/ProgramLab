@@ -10,6 +10,7 @@ public interface IDBManager {
 
     int insertKeywordStatisticsTrend(KeywordStatisticsTrendResult keywordTrendResult);
     void insertKeywordMonth(KeywordSearchMonth keywordMonth);
+    void insertCategoryList(KeywordSearchMonth gptClickResponse);
     List<String> selectKeywordTrend();
     List<String> selectMonthKeyword();
 

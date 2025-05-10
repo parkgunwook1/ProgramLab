@@ -21,6 +21,11 @@ public class MockDBManager implements IDBManager{
     }
 
     @Override
+    public void insertCategoryList(KeywordSearchMonth gptClickResponse) {
+
+    }
+
+    @Override
     public List<String> selectKeywordTrend() {
         return null;
     }

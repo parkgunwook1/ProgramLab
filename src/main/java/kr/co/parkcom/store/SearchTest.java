@@ -23,7 +23,7 @@ public class SearchTest {
         DataLabContextService searchService = new DataLabContextService(datalabKey , datalabValue , datalabSearchUrl);
         DataLabContextService clickService = new DataLabContextService(datalabKey , datalabValue , datalabClickUrl);
 
-        clickService.KeywordClickTrend();
+//        clickService.KeywordClickTrend();
         }catch (Exception e) {
             e.printStackTrace();
         }

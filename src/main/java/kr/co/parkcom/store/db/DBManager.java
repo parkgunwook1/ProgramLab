@@ -73,6 +73,33 @@ public class DBManager implements IDBManager{
     }
 
     @Override
+    public void insertCategoryList(KeywordSearchMonth gptClickResponse) {
+        String sql = "INSERT INTO keyword_category(category, jan_search, feb_search, mar_search, apr_search, may_search, jun_search, " +
+                "jul_search, aug_search, sep_search, oct_search, nov_search, dec_search)"
+                +  "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+       try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1 , gptClickResponse.getKeyword());
+            pstmt.setInt(2 , gptClickResponse.getMonth1());
+            pstmt.setInt(3 , gptClickResponse.getMonth2());
+            pstmt.setInt(4 , gptClickResponse.getMonth3());
+            pstmt.setInt(5 , gptClickResponse.getMonth4());
+            pstmt.setInt(6 , gptClickResponse.getMonth5());
+            pstmt.setInt(7 , gptClickResponse.getMonth6());
+            pstmt.setInt(8 , gptClickResponse.getMonth7());
+            pstmt.setInt(9 , gptClickResponse.getMonth8());
+            pstmt.setInt(10 , gptClickResponse.getMonth9());
+            pstmt.setInt(11 , gptClickResponse.getMonth10());
+            pstmt.setInt(12 , gptClickResponse.getMonth11());
+            pstmt.setInt(13 , gptClickResponse.getMonth12());
+
+            pstmt.executeUpdate();
+        }catch (Exception e) {
+            log.error(e.getMessage() , e);
+        }
+    }
+
+    @Override
     public List<String> selectKeywordTrend() {
         List<String> keywords = new ArrayList<>();
         String sql = "SELECT keyword FROM year_keyword_trend";
