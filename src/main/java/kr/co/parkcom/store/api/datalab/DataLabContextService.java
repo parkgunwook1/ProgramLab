@@ -1,9 +1,9 @@
 package kr.co.parkcom.store.api.datalab;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.parkcom.store.api.datalab.search.dto.Data;
-import kr.co.parkcom.store.api.datalab.search.dto.DataLabResponse;
-import kr.co.parkcom.store.api.datalab.search.dto.Result;
+import kr.co.parkcom.store.api.datalab.dto.Data;
+import kr.co.parkcom.store.api.datalab.dto.DataLabResponse;
+import kr.co.parkcom.store.api.datalab.dto.Result;
 import kr.co.parkcom.store.domain.keyword.service.datalab.dto.GptClickResponse;
 import kr.co.parkcom.store.domain.keyword.service.datalab.dto.KeywordSearchMonth;
 import kr.co.parkcom.store.domain.keyword.service.datalab.dto.KeywordStatisticsTrendResult;

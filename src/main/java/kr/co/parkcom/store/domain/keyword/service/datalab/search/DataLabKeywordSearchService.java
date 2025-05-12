@@ -31,7 +31,7 @@ public class DataLabKeywordSearchService implements Runnable{
          while (true) {
              try {
                  if (gptKeywordListService.getSearchListSize() > 0) {
-                     String keyword = gptKeywordListService.getKeyword();
+                     String keyword = gptKeywordListService.getSearchKeyword();
                      int count = 0;
                      List<String> dbList;
                      dbList = idbManager.selectMonthKeyword();
@@ -43,11 +43,12 @@ public class DataLabKeywordSearchService implements Runnable{
                      }
                      if (count != 0) {
                          KeywordSearchMonth result = dataLabContextService.KeywordSearchMonthTrend(keyword);
+                         System.out.println(result.toString());
                          idbManager.insertKeywordMonth(result);
                          dbResult++;
                      }
                  }
-                 System.out.println(dbResult);
+                 System.out.println("searchService count : "  + dbResult);
                  Thread.sleep(2_000);
              } catch (Exception e) {
                  e.printStackTrace();

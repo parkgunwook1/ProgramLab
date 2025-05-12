@@ -1,4 +1,4 @@
-package kr.co.parkcom.store.api.datalab.search.dto;
+package kr.co.parkcom.store.api.datalab.dto;
 
 import java.util.List;
 

@@ -90,7 +90,7 @@ public class GptContextService implements IGptKeywordGenerator {
                 throw new IOException("Unexpected code: " + response);
             }
             String respJson = response.body().string();
-
+            System.out.println(respJson);
 
            return respJson;
         }
@@ -104,18 +104,16 @@ public class GptContextService implements IGptKeywordGenerator {
 
 //        String excludeList = String.join(", ", list);
 //        System.out.println("make gpt - exclude Keyword list : " + excludeList);
-
+        System.out.println("makeSearchList 호출");
         String prompt = "다음 조건에 맞춰 키워드를 생성해줘.\n\n" +
                 "조건:\n" +
                 "- 쿠팡, 스마트스토어, 지마켓, 11번가, 옥션 같은 **국내 온라인 마켓에서 실제로 판매 가능한 상품 키워드**만 생성할 것\n" +
                 "- **음식/식품은 제외**하고, 실체가 있는 물건(헬스케어 , 강아지 , 가전 , 인테리어 , 스포츠, 디지털 등)만 포함\n" +
                 "- **2024년 1월~12월까지의 검색 트렌드를 기반으로**, 실제로 많이 검색되고 판매 가능성이 높은 키워드 위주로\n" +
-                "- 키워드는 GPT 네가 봐도 '**내가 소비자라면 이건 사야 한다**'고 느껴질 만한 상품 위주로 선정할 것\n" +
+                "- 키워드는 GPT 네가 봐도 '**소비자라면 이건 사야 한다**'고 느껴질 만한 상품 위주로 선정할 것\n" +
                 "- 총 600개 키워드를 월별 50개씩 구성 (월별은 1월부터 12월까지)\n" +
                 "- 키워드는 **콤마(,)로 구분된 하나의 문자열**로만 반환하고, 설명은 절대 붙이지 말 것\n" +
-                "- 콤마 뒤에는 반드시 한 칸 띄어 쓸 것\n" +
-                "추가 조건:\n" +
-                "- **:\n";
+                "- 콤마 뒤에는 반드시 한 칸 띄어 쓸 것\n";
 
         String response = sendPrompt(prompt);
         GptResponse searchResponse = mapper.readValue(response, GptResponse.class);
@@ -124,6 +122,7 @@ public class GptContextService implements IGptKeywordGenerator {
 
     public GptResponse makeClickList() throws IOException, Exception {
 
+        System.out.println("makeClickList 호출");
         String prompt = """
                 다음 조건에 따라 **네이버 데이터랩 '카테고리별 클릭 트렌드' API 요청에 적합한 키워드**를 생성해줘.
 
@@ -141,6 +140,7 @@ public class GptContextService implements IGptKeywordGenerator {
                 """;
         String response = sendPrompt(prompt);
         GptResponse clickResponse = mapper.readValue(response, GptResponse.class);
+        System.out.println(clickResponse.toString());
         return clickResponse;
     }
 }

@@ -3,7 +3,6 @@ package kr.co.parkcom.store.domain.keyword.service.datalab.click;
 import kr.co.parkcom.store.Application;
 import kr.co.parkcom.store.api.datalab.DataLabContextService;
 import kr.co.parkcom.store.db.IDBManager;
-import kr.co.parkcom.store.domain.keyword.service.datalab.dto.GptClickResponse;
 import kr.co.parkcom.store.domain.keyword.service.datalab.dto.KeywordSearchMonth;
 import kr.co.parkcom.store.domain.keyword.service.gpt.GptKeywordListService;
 import org.slf4j.Logger;
@@ -27,10 +26,11 @@ public class DataLabKeywordClickService implements Runnable{
         int dbResult = 0;
         while (true){
             try {
-                if (gptKeywordListService.getSearchListSize() > 0) {
-                    String keyword = gptKeywordListService.getKeyword();
+                if (gptKeywordListService.getClickListSize() > 0) {
+                    String keyword = gptKeywordListService.getClickKeyword();
 
                     KeywordSearchMonth result = dataLabContextService.KeywordClickTrend(keyword);
+                    System.out.println(result.toString());
                     idbManager.insertCategoryList(result);
                     dbResult++;
                 }
